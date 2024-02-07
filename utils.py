@@ -16,6 +16,119 @@ def read_dataset(filename):
         exit(1)
 
 
+def get_table_data(dataFrame):
+
+    data = get_only_numeric_values(dataFrame)
+
+    tableData = {}
+
+    for serieName, serie in data.items():
+        tableData[serieName] = get_all_fields(serie)
+
+    return tableData
+
+
+def get_only_numeric_values(dataFrame):
+
+	return ( dataFrame.iloc[: , 6:] ) # Select From 7th to end
+
+
+def get_all_fields(column):
+
+    featureColumn = []
+
+    columnSort = column.tolist()
+    columnSort.sort()
+
+    featureColumn.append(get_count(columnSort))
+    featureColumn.append(get_mean(columnSort))
+    featureColumn.append(get_std(columnSort))
+    featureColumn.append(get_min(columnSort))
+    featureColumn.append(get_25_percentile(columnSort))
+    featureColumn.append(get_50_percentile(columnSort))
+    featureColumn.append(get_75_percentile(columnSort))
+    featureColumn.append(get_max(columnSort))
+
+    return featureColumn
+
+
+def get_count(column):
+
+    return len(column)
+
+
+def get_mean(column):
+
+    try:
+        meanColumn = sum(column) / get_count(column)
+    except Exception :
+        print("Don't change the format of the csv file.")
+        exit(1)
+
+    return meanColumn
+
+
+def get_std(column):
+
+    n = get_count(column) - 1
+    total = 0
+
+    for i in range(n):
+        total += (column[i] - get_mean(column)) * (column[i] - get_mean(column))
+
+    std = total / n
+    
+    return std
+
+
+def get_min(column):
+
+    min = column[0]
+    length = len(column)
+
+    for i in range(length):
+        if column[i] < min:
+            min = column[i]
+
+    return min
+
+
+def get_25_percentile(column):
+
+    percent = 0.25
+    indexPercentile = int(percent * get_count(column))
+
+    return column[indexPercentile]
+
+
+def get_50_percentile(column):
+
+    percent = 0.5
+    indexPercentile = int(percent * get_count(column))
+
+    return column[indexPercentile]
+
+
+def get_75_percentile(column):
+
+    percent = 0.75
+    indexPercentile = int(percent * get_count(column))
+    
+    return column[indexPercentile]
+
+
+def get_max(column):
+
+    max = column[0]
+    length = len(column)
+
+    for i in range(length):
+        if column[i] > max:
+            max = column[i]
+
+    return max
+
+
 def standard_deviation(scores):
     n = len(scores)
     mean = sum(scores) / n
