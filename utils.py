@@ -16,40 +16,40 @@ def read_dataset(filename):
         exit(1)
 
 
-def get_table_data(dataFrame):
+def get_table_data(data_frame):
 
-    data = get_only_numeric_values(dataFrame)
+    data = get_only_numeric_values(data_frame)
 
     tableData = {}
 
-    for serieName, serie in data.items():
-        tableData[serieName] = get_all_fields(serie)
+    for serie_name, serie in data.items():
+        tableData[serie_name] = get_all_fields(serie)
 
     return tableData
 
 
-def get_only_numeric_values(dataFrame):
+def get_only_numeric_values(data_frame):
 
-	return ( dataFrame.iloc[: , 6:] ) # Select From 7th to end
+	return ( data_frame.iloc[: , 6:] ) # Select From 7th to end
 
 
 def get_all_fields(column):
 
-    featureColumn = []
+    feature_column = []
 
-    columnSort = column.tolist()
-    columnSort.sort()
+    column_sort = column.tolist()
+    column_sort.sort()
 
-    featureColumn.append(get_count(columnSort))
-    featureColumn.append(get_mean(columnSort))
-    featureColumn.append(get_std(columnSort))
-    featureColumn.append(get_min(columnSort))
-    featureColumn.append(get_25_percentile(columnSort))
-    featureColumn.append(get_50_percentile(columnSort))
-    featureColumn.append(get_75_percentile(columnSort))
-    featureColumn.append(get_max(columnSort))
+    feature_column.append(get_count(column_sort))
+    feature_column.append(get_mean(column_sort))
+    feature_column.append(get_std(column_sort))
+    feature_column.append(get_min(column_sort))
+    feature_column.append(get_25_percentile(column_sort))
+    feature_column.append(get_50_percentile(column_sort))
+    feature_column.append(get_75_percentile(column_sort))
+    feature_column.append(get_max(column_sort))
 
-    return featureColumn
+    return feature_column
 
 
 def get_count(column):
@@ -60,12 +60,12 @@ def get_count(column):
 def get_mean(column):
 
     try:
-        meanColumn = sum(column) / get_count(column)
+        mean_column = sum(column) / get_count(column)
     except Exception :
         print("Don't change the format of the csv file.")
         exit(1)
 
-    return meanColumn
+    return mean_column
 
 
 def get_std(column):
@@ -96,25 +96,25 @@ def get_min(column):
 def get_25_percentile(column):
 
     percent = 0.25
-    indexPercentile = int(percent * get_count(column))
+    index_percentile = int(percent * get_count(column))
 
-    return column[indexPercentile]
+    return column[index_percentile]
 
 
 def get_50_percentile(column):
 
     percent = 0.5
-    indexPercentile = int(percent * get_count(column))
+    index_percentile = int(percent * get_count(column))
 
-    return column[indexPercentile]
+    return column[index_percentile]
 
 
 def get_75_percentile(column):
 
     percent = 0.75
-    indexPercentile = int(percent * get_count(column))
+    index_percentile = int(percent * get_count(column))
     
-    return column[indexPercentile]
+    return column[index_percentile]
 
 
 def get_max(column):
