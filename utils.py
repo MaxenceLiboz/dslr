@@ -1,10 +1,23 @@
 import pandas as pd
+from argparse import ArgumentParser
 
 COURSES = ["Arithmancy", "Astronomy", "Herbology",
            "Defense Against the Dark Arts", "Divination",
            "Muggle Studies", "Ancient Runes", "History of Magic",
            "Transfiguration", "Potions", "Care of Magical Creatures",
            "Charms", "Flying"]
+
+
+def get_file_path():
+    parser = ArgumentParser()
+    parser.add_argument("-f", "--file", dest="data_file", help="Open datasets/dataset_train.csv file")
+
+    args = parser.parse_args()
+    file_path = args.data_file
+    if (file_path is None):
+        print("Correct format: python3 describe.py -f {file_path}")
+        exit(1)
+    return file_path
 
 
 def read_dataset(filename):
@@ -29,8 +42,7 @@ def get_table_data(data_frame):
 
 
 def get_only_numeric_values(data_frame):
-
-	return ( data_frame.iloc[: , 6:] ) # Select From 7th to end
+    return (data_frame.iloc[:, 6:])  # Select From 7th to end
 
 
 def get_all_fields(column):
@@ -58,10 +70,9 @@ def get_count(column):
 
 
 def get_mean(column):
-
     try:
         mean_column = sum(column) / get_count(column)
-    except Exception :
+    except Exception:
         print("Don't change the format of the csv file.")
         exit(1)
 
@@ -77,7 +88,7 @@ def get_std(column):
         total += (column[i] - get_mean(column)) * (column[i] - get_mean(column))
 
     std = total / n
-    
+
     return std
 
 
