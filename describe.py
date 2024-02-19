@@ -1,11 +1,12 @@
-from utils import read_dataset, get_table_data, get_file_path, standardization
+from utils import get_file_path, read_dataset, standardization, get_table_data
 import pandas as pd
 
 
 def describe(standardizedData):
 
     index_labels=['Count', 'Mean', 'Std', 'Min', '25%', '50%', '75%', 'Max']
-    data_frame = pd.DataFrame(standardizedData, index_labels)
+    table_data = get_table_data(standardizedData.iloc[:, 6:])
+    data_frame = pd.DataFrame(table_data, index_labels)
 
     pd.options.display.max_columns = 13 # set the max displayable columns
     print(data_frame)
@@ -14,6 +15,5 @@ def describe(standardizedData):
 if __name__ == "__main__":
     file_path = get_file_path()
     dataset = read_dataset(file_path)
-    dataset.columns = dataset.columns.str.replace(' ', '_')
-    standardizedData = get_table_data(dataset)
-    describe(standardizedData)
+    standardization(dataset)
+    describe(dataset)

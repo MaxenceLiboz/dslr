@@ -29,9 +29,7 @@ def read_dataset(filename):
         exit(1)
 
 
-def get_table_data(data_frame):
-
-    data = get_only_numeric_values(data_frame)
+def get_table_data(data):
 
     tableData = {}
 
@@ -160,8 +158,8 @@ def standardization(dataset):
         for course in COURSES:
             values = dataset[course]
             dataset[course] = (values - mean_score(values)) / standard_deviation(values)
-    except Exception:
-        print("An error happend during the standarization")
+    except Exception as e:
+        print("An error happend during the standarization    " + e)
         exit(1)
 
     return dataset
