@@ -5,7 +5,7 @@ import pandas as pd
 def describe(standardizedData):
 
     index_labels=['Count', 'Mean', 'Std', 'Min', '25%', '50%', '75%', 'Max']
-    table_data = get_table_data(standardizedData.iloc[:, 6:])
+    table_data = get_table_data(standardizedData)
     data_frame = pd.DataFrame(table_data, index_labels)
 
     pd.options.display.max_columns = 13 # set the max displayable columns

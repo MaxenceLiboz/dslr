@@ -29,7 +29,9 @@ def read_dataset(filename):
         exit(1)
 
 
-def get_table_data(data):
+def get_table_data(data_frame):
+
+    data = get_only_numeric_values(data_frame)
 
     tableData = {}
 
@@ -40,7 +42,7 @@ def get_table_data(data):
 
 
 def get_only_numeric_values(data_frame):
-    return (data_frame.iloc[:, 6:])  # Select From 7th to end
+    return (data_frame.iloc[:, 5:])  # Select From 6th to end
 
 
 def get_all_fields(column):
