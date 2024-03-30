@@ -29,9 +29,7 @@ def read_dataset(filename):
         exit(1)
 
 
-def get_table_data(data_frame):
-
-    data = get_only_numeric_values(data_frame)
+def get_table_data(data):
 
     tableData = {}
 
@@ -80,14 +78,18 @@ def get_mean(column):
 
 
 def get_std(column):
+    try:
+        n = get_count(column) - 1
+        total = 0
 
-    n = get_count(column) - 1
-    total = 0
+        for i in range(n):
+            total += (column[i] - get_mean(column)) * (column[i] - get_mean(column))
 
-    for i in range(n):
-        total += (column[i] - get_mean(column)) * (column[i] - get_mean(column))
+        std = total / n
 
-    std = total / n
+    except Exception:
+        print("Don't change the format of the csv file.")
+        exit(1)
 
     return std
 
