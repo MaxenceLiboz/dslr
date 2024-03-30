@@ -150,6 +150,7 @@ def standard_deviation(scores):
 
 
 def mean_score(scores):
+    # print(len(scores))
     return sum(scores) / len(scores)
 
 
@@ -158,8 +159,8 @@ def standardization(dataset):
         for course in COURSES:
             values = dataset[course]
             dataset[course] = (values - mean_score(values)) / standard_deviation(values)
-    except Exception as e:
-        print("An error happend during the standarization    " + e)
+    except Exception as exp:
+        print(f"An error happend during the standarization: {exp}")
         exit(1)
 
     return dataset
