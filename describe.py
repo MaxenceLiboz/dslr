@@ -1,4 +1,4 @@
-from utils import get_file_path, read_dataset, standardization, get_table_data
+from utils import get_file_path, read_dataset, standardization, get_table_data, COURSES
 import pandas as pd
 
 
@@ -14,6 +14,7 @@ def describe(standardizedData):
 
 if __name__ == "__main__":
     file_path = get_file_path()
-    dataset = read_dataset(file_path)
-    standardization(dataset)
+    dataset = read_dataset(file_path, True)
+    dropColumns = ["Hogwarts House", "First Name", "Last Name", "Birthday", "Best Hand"]
+    standardization(dataset, dropColumns)
     describe(dataset)

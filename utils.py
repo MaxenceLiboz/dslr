@@ -1,11 +1,18 @@
 import pandas as pd
+import numpy as np
 from argparse import ArgumentParser
+from sklearn.preprocessing import LabelEncoder
 
 COURSES = ["Arithmancy", "Astronomy", "Herbology",
            "Defense Against the Dark Arts", "Divination",
            "Muggle Studies", "Ancient Runes", "History of Magic",
            "Transfiguration", "Potions", "Care of Magical Creatures",
            "Charms", "Flying"]
+
+
+label_encoder = LabelEncoder()
+
+
 
 
 def get_file_path():
@@ -20,18 +27,16 @@ def get_file_path():
     return file_path
 
 
-def read_dataset(filename):
+def read_dataset(filename, doDropNa):
     try:
         dataset = pd.read_csv(filename, index_col="Index")
-        return dataset.dropna()
+        return dataset.dropna() if doDropNa else dataset
     except Exception:
         print("Don't change the format of the csv file.")
         exit(1)
 
 
-def get_table_data(data_frame):
-
-    data = get_only_numeric_values(data_frame)
+def get_table_data(data):
 
     tableData = {}
 
@@ -39,10 +44,6 @@ def get_table_data(data_frame):
         tableData[serie_name] = get_all_fields(serie)
 
     return tableData
-
-
-def get_only_numeric_values(data_frame):
-    return (data_frame.iloc[:, 5:])  # Select From 6th to end
 
 
 def get_all_fields(column):
@@ -152,13 +153,18 @@ def standard_deviation(scores):
 
 
 def mean_score(scores):
-    # print(len(scores))
     return sum(scores) / len(scores)
 
 
-def standardization(dataset):
+def standardization(dataset, dropColumns):
+    if (dropColumns):
+        dataset.drop(columns=dropColumns, inplace=True) 
+
     try:
-        for course in COURSES:
+        for course in dataset:
+            if (dataset[course].dtypes != 'float64'):
+                continue
+            dataset[course] = dataset[course].transform(lambda x: x.fillna(x.mean()))
             values = dataset[course]
             dataset[course] = (values - mean_score(values)) / standard_deviation(values)
     except Exception as exp:
@@ -166,3 +172,62 @@ def standardization(dataset):
         exit(1)
 
     return dataset
+
+
+def predict(X, weights):
+    predictions = sigmoid(np.dot(X, weights.T))
+    return np.argmax(predictions, axis=1)
+
+
+def gradient_descent(X, y, learning_rate, num_iters):
+    m, n = X.shape
+    theta = np.zeros(n)
+
+    for _ in range(num_iters):
+        # Compute the difference between predicted values and acutal values
+        error = sigmoid(np.dot(X, theta.T)) - y
+        # Compute the partial derivate
+        gradient = np.dot(X.T, error) / m
+        # Update de theta
+        theta -= learning_rate * gradient
+
+    return theta
+
+
+def train_logistic_regression(X, Y, num_classes, learning_rate, num_iters):
+    weights = []
+    # To do a one vs all approche, loop through each class  
+    for i in range(num_classes):
+        # Construct a binary list with 1 for our class and 0 for other classes
+        y_one_vs_all = (Y == i).astype(int)
+        theta = gradient_descent(X, y_one_vs_all, learning_rate, num_iters)
+        weights.append(theta)
+    return np.array(weights)
+
+
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+
+def preproccess(dataset: pd.DataFrame, train: bool):
+    drop_columns = ["Hogwarts House", "First Name", "Last Name", "Birthday", "Best Hand", "Arithmancy", "Astronomy", "Care of Magical Creatures"]
+    X = dataset
+    if train:
+        Y = dataset["Hogwarts House"]
+        Y = encode(Y)
+    else:
+        Y = None
+
+    X = standardization(X, drop_columns) 
+
+    X = X.to_numpy()
+
+    return X, Y
+
+def encode(housesList):
+    houses = {"Ravenclaw": 0, "Slytherin": 1, "Gryffindor": 2, "Hufflepuff": 3}
+    return np.array([houses.get(house) for house in housesList])
+
+def decode(indexList):
+    houses = {0: "Ravenclaw", 1: "Slytherin", 2: "Gryffindor", 3: "Hufflepuff"}
+    return np.array([houses.get(index) for index in indexList])

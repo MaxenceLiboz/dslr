@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from utils import read_dataset, COURSES, standardization, get_file_path
+from utils import read_dataset, COURSES, standardization, get_file_path, COURSES
 
 
 def get_grades(dataset, house, course):
@@ -38,6 +38,6 @@ def draw_histogram(dataset):
 
 if __name__ == "__main__":
     file_path = get_file_path()
-    dataset = read_dataset(file_path)
-    standardization(dataset)
+    dataset = read_dataset(file_path, True)
+    standardization(dataset,None)
     draw_histogram(dataset)

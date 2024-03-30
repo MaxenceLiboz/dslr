@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from utils import read_dataset, standardization, get_file_path
+from utils import read_dataset, standardization, get_file_path, COURSES
 
 
 def draw_scatter_plot(dataset):
@@ -13,6 +13,6 @@ def draw_scatter_plot(dataset):
 
 if __name__ == "__main__":
     file_path = get_file_path()
-    dataset = read_dataset(file_path)
-    standardization(dataset)
+    dataset = read_dataset(file_path, True)
+    standardization(dataset,None)
     draw_scatter_plot(dataset)
