@@ -5,7 +5,7 @@ import seaborn as sb
 
 if __name__ == "__main__":
     file_path = get_file_path()
-    dataset = read_dataset(file_path, True)
+    dataset, _ = read_dataset(file_path, True)
     standardization(dataset,None)
     sb.pairplot(dataset, hue='Hogwarts House')
     plt.show()

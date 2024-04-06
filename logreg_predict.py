@@ -4,7 +4,7 @@ import numpy as np
 
 if __name__ == "__main__":
     file_path = get_file_path()
-    dataset_test = read_dataset(file_path, False)
+    dataset_test, _ = read_dataset(file_path, False)
     wieghts = weights = np.load('./weights.npy')
     x_test, _ = preproccess(dataset_test, train=False)
 

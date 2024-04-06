@@ -27,26 +27,31 @@ def get_file_path():
     return file_path
 
 
-def read_dataset(filename, doDropNa):
+def read_dataset(filename, do_drop_na):
     try:
         dataset = pd.read_csv(filename, index_col="Index")
-        return dataset.dropna() if doDropNa else dataset
+
+        drop_count = []
+        for column in dataset.columns[5:]:
+            drop_count.append(dataset[column].isna().sum())
+
+        return (dataset.dropna(), drop_count) if do_drop_na else (dataset, None)
     except Exception:
         print("Don't change the format of the csv file.")
         exit(1)
 
 
-def get_table_data(data):
+def get_table_data(data, drop_count):
 
     tableData = {}
 
-    for serie_name, serie in data.items():
-        tableData[serie_name] = get_all_fields(serie)
+    for index, serie_name in enumerate(data):
+        tableData[serie_name] = get_all_fields(data.get(serie_name), drop_count[index])
 
     return tableData
 
 
-def get_all_fields(column):
+def get_all_fields(column, drop_count):
 
     feature_column = []
 
@@ -61,6 +66,7 @@ def get_all_fields(column):
     feature_column.append(get_50_percentile(column_sort))
     feature_column.append(get_75_percentile(column_sort))
     feature_column.append(get_max(column_sort))
+    feature_column.append(drop_count)
 
     return feature_column
 
@@ -156,9 +162,9 @@ def mean_score(scores):
     return sum(scores) / len(scores)
 
 
-def standardization(dataset, dropColumns):
-    if (dropColumns):
-        dataset.drop(columns=dropColumns, inplace=True) 
+def standardization(dataset, drop_columns):
+    if (drop_columns):
+        dataset.drop(columns=drop_columns, inplace=True) 
 
     try:
         for course in dataset:
@@ -183,7 +189,7 @@ def gradient_descent(X, y, learning_rate, num_iters):
     m, n = X.shape
     theta = np.zeros(n)
 
-    for _ in range(num_iters):
+    for i in range(num_iters):
         # Compute the difference between predicted values and acutal values
         error = sigmoid(np.dot(X, theta.T)) - y
         # Compute the partial derivate
@@ -193,6 +199,40 @@ def gradient_descent(X, y, learning_rate, num_iters):
 
     return theta
 
+def stochastic_gradient_descent(X, y, learning_rate, num_iters):
+    m, n = X.shape
+    theta = np.zeros(n)
+
+    num_iter = 0
+    while (num_iter <= num_iters):
+
+        for j in range(n):
+
+            for i in range(m):
+
+                # Compute the difference between predicted values and acutal values
+                error = sigmoid(np.dot(X[i], theta.T)) - y[i]
+                # Compute the partial derivate
+                gradient = np.dot(X[i].T, error) / m
+                # Update de theta
+                theta -= learning_rate * gradient
+        
+        num_iter += n
+
+    return theta
+
+
+def train_logistic_regression_stochastic(X, Y, num_classes, learning_rate, num_iters):
+    weights = []
+    # To do a one vs all approche, loop through each class  
+    for i in range(num_classes):
+        # Construct a binary list with 1 for our class and 0 for other classes
+        y_one_vs_all = (Y == i).astype(int)
+        theta = stochastic_gradient_descent(X, y_one_vs_all, learning_rate, num_iters)
+        weights.append(theta)
+
+    return np.array(weights)
+    
 
 def train_logistic_regression(X, Y, num_classes, learning_rate, num_iters):
     weights = []
@@ -213,7 +253,7 @@ def preproccess(dataset: pd.DataFrame, train: bool):
     drop_columns = ["Hogwarts House", "First Name", "Last Name", "Birthday", "Best Hand", "Arithmancy", "Astronomy", "Care of Magical Creatures"]
     X = dataset
     if train:
-        Y = dataset["Hogwarts House"]
+        Y = X["Hogwarts House"]
         Y = encode(Y)
     else:
         Y = None
@@ -231,3 +271,11 @@ def encode(housesList):
 def decode(indexList):
     houses = {0: "Ravenclaw", 1: "Slytherin", 2: "Gryffindor", 3: "Hufflepuff"}
     return np.array([houses.get(index) for index in indexList])
+
+def calcCost(X, Y, weights):
+    sum = 0
+    prediction = predict(X, weights)
+    sum = (prediction - Y) ** 2
+
+    cost = sum / (2 * len(Y))
+    return cost
